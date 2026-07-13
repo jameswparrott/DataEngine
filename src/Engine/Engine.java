@@ -50,8 +50,8 @@ public class Engine {
                 iEngineLogic.input(window, scene, currentTime - initialTime);
             }
             if (deltaUps >= 1){
-                long deltaUpdateMillisec = currentTime - updateTime;
-                iEngineLogic.update(window, scene, deltaUpdateMillisec);
+                long deltaUpdateMillis = currentTime - updateTime;
+                iEngineLogic.update(window, scene, deltaUpdateMillis);
                 deltaUps --;
             }
             if (deltaFps >= 1){

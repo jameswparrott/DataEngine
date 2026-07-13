@@ -17,12 +17,12 @@ public class Game implements IEngineLogic {
     }
 
     @Override
-    public void input(Window window, Scene scene, long deltaTimeMillisec) {
+    public void input(Window window, Scene scene, long deltaTimeMillis) {
 
     }
 
     @Override
-    public void update(Window window, Scene scene, long deltaTimeMillisec) {
+    public void update(Window window, Scene scene, long deltaTimeMillis) {
 
     }
 
