@@ -3,6 +3,7 @@ package Engine;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.system.MemoryUtil;
+
 import java.util.concurrent.Callable;
 
 import static org.lwjgl.glfw.GLFW.*;
@@ -17,7 +18,7 @@ public class Window {
     private int windowWidth;
     private Callable<Void> resizeFunction;
 
-    public Window(WindowData windowData, Callable<Void> resizeFunction){
+    public Window(WindowData windowData, Callable<Void> resizeFunction) {
 
         this.resizeFunction = resizeFunction;
 
@@ -56,7 +57,9 @@ public class Window {
 
         glfwSetErrorCallback((int errorCode, long msgPtr) -> System.err.println("Error code: " + errorCode + ", msg: " + MemoryUtil.memUTF8(msgPtr)));
 
-        glfwSetKeyCallback(windowHandle, (window, key, scancode, action, mods) -> {keyCallBack(key, action);});
+        glfwSetKeyCallback(windowHandle, (window, key, scancode, action, mods) -> {
+            keyCallBack(key, action);
+        });
 
         glfwMakeContextCurrent(windowHandle);
 
@@ -76,10 +79,10 @@ public class Window {
 
     }
 
-    protected void resized(int width, int height){
+    protected void resized(int width, int height) {
         this.windowWidth = width;
         this.windowHeight = height;
-        try{
+        try {
             resizeFunction.call();
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -92,39 +95,39 @@ public class Window {
         }
     }
 
-    public void pollEvents(){
+    public void pollEvents() {
         glfwPollEvents();
     }
 
-    public boolean isKeyPressed(int keyCode){
+    public boolean isKeyPressed(int keyCode) {
         return glfwGetKey(windowHandle, keyCode) == GLFW_PRESS;
     }
 
-    public boolean isKeyReleased(int keyCode){
+    public boolean isKeyReleased(int keyCode) {
         return glfwGetKey(windowHandle, keyCode) == GLFW_RELEASE;
     }
 
-    public void update(){
+    public void update() {
         glfwSwapBuffers(windowHandle);
     }
 
-    public long getWindowHandle(){
+    public long getWindowHandle() {
         return this.windowHandle;
     }
 
-    public int getWindowHeight(){
+    public int getWindowHeight() {
         return this.windowHeight;
     }
 
-    public int getWindowWidth(){
+    public int getWindowWidth() {
         return this.windowWidth;
     }
 
-    public boolean windowShouldClose(){
+    public boolean windowShouldClose() {
         return glfwWindowShouldClose(windowHandle);
     }
 
-    public void cleanup(){
+    public void cleanup() {
         glfwFreeCallbacks(windowHandle);
         glfwDestroyWindow(windowHandle);
         glfwTerminate();
