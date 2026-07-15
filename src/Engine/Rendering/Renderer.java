@@ -16,8 +16,8 @@ public class Renderer {
     public Renderer() {
         GL.createCapabilities();
         List<ShaderData> shaderDataList = new ArrayList<>();
-        shaderDataList.add(new ShaderData("res/shaders/basic.vert", GL_VERTEX_SHADER));
-        shaderDataList.add(new ShaderData("res/shaders/basic.frag", GL_FRAGMENT_SHADER));
+        shaderDataList.add(new ShaderData("res/shaders/vertex.glsl", GL_VERTEX_SHADER));
+        shaderDataList.add(new ShaderData("res/shaders/fragment.glsl", GL_FRAGMENT_SHADER));
         shaderProgram = new ShaderProgram(shaderDataList);
     }
 
