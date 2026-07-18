@@ -1,4 +1,4 @@
 package Engine.Rendering;
 
-public record MeshData(int numVertices, float[] positions) {
+public record MeshData(float[] positions, float[] colors, int[] indices) {
 }

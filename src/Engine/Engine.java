@@ -7,11 +7,11 @@ public class Engine {
 
     private final IEngineLogic iEngineLogic;
     private final Window window;
-    private Renderer renderer;
-    private Scene scene;
+    private final Renderer renderer;
+    private final Scene scene;
     private boolean isRunning;
-    private int targetUps;
-    private int targetFps;
+    private final int targetUps;
+    private final int targetFps;
 
     public Engine(WindowData windowData, IEngineLogic iEngineLogic) {
 
@@ -23,7 +23,7 @@ public class Engine {
         targetFps = windowData.fps();
         targetUps = windowData.ups();
         renderer = new Renderer();
-        scene = new Scene();
+        scene = new Scene(windowData.windowWidth(), windowData.windowHeight());
         isRunning = false;
         iEngineLogic.init(window, scene, renderer);
 
@@ -75,7 +75,7 @@ public class Engine {
     }
 
     public void resize() {
-
+        scene.resize(window.getWindowWidth(), window.getWindowHeight());
     }
 
     public void stop() {
