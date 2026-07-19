@@ -12,7 +12,7 @@ import static org.lwjgl.opengl.GL30.*;
 public class Renderer {
 
     private final ShaderProgram shaderProgram;
-    private UniformMap uniformMap;
+    private final UniformMap uniformMap;
 
     public Renderer() {
         GL.createCapabilities();
@@ -30,19 +30,14 @@ public class Renderer {
 
     public void render(Window window, Scene scene) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
         shaderProgram.bind();
-
         uniformMap.setUniform("projection", scene.getProjection());
-
         scene.getMeshMap().values().forEach(mesh -> {
             glBindVertexArray(mesh.getVaoId());
             shaderProgram.validate();
             glDrawElements(GL_TRIANGLES, mesh.getNumVertices(), GL_UNSIGNED_INT, 0);
         });
-
         glBindVertexArray(0);
-
         shaderProgram.unbind();
     }
 

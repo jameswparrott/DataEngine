@@ -13,12 +13,14 @@ import static org.lwjgl.opengl.GL20.glUniformMatrix4fv;
 
 public class UniformMap {
 
-    private int programId;
-    private Map<String, Integer> uniforms;
+    private final int programId;
+    private final Map<String, Integer> uniforms;
+    private final FloatBuffer matrixBuffer;
 
     public UniformMap(int programId) {
         this.programId = programId;
         uniforms = new HashMap<>();
+        matrixBuffer = MemoryUtil.memCallocFloat(Matrix4f.LENGTH);
     }
 
     public void createUniform(String uniformName) {
@@ -34,20 +36,14 @@ public class UniformMap {
         if (location == null) {
             throw new RuntimeException("Could not find uniform [" + uniformName + "].");
         }
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            FloatBuffer matrixBuffer = stack.mallocFloat(16);
-            matrixBuffer.put(0, matrix.getComponents());
-            glUniformMatrix4fv(location, false, matrixBuffer);
-        }
-        //TODO: Rewrite to assign memory allocated buffer for duration of rendering loop
-        /*FloatBuffer matrixBuffer = MemoryUtil.memCallocFloat(Matrix4f.LENGTH);
-        matrixBuffer.put(0, matrix.getComponents());
+        matrixBuffer.clear();
+        matrix.put(matrixBuffer);
+        matrixBuffer.flip();
         glUniformMatrix4fv(location, false, matrixBuffer);
-        MemoryUtil.memFree(matrixBuffer);*/
     }
 
     public void cleanup() {
-        //TODO: Free memory
+        MemoryUtil.memFree(matrixBuffer);
     }
 
 }

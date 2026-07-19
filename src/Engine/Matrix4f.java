@@ -80,6 +80,12 @@ public class Matrix4f {
         return components;
     }
 
+    public void put(FloatBuffer floatBuffer) {
+        for (int i = 0; i < LENGTH; i++) {
+            floatBuffer.put(components[i]);
+        }
+    }
+
     public String toString() {
         return "[" + get(0) + ", " + get(4) + ", " + get(8) + ", " + get(12) + "]\n" +
                 "[" + get(1) + ", " + get(5) + ", " + get(9) + ", " + get(13) + "]\n" +
