@@ -1,6 +1,6 @@
 package Engine.Rendering;
 
-import Engine.Matrix4f;
+import Engine.Math.Matrix4f;
 
 import java.util.HashMap;
 import java.util.Map;

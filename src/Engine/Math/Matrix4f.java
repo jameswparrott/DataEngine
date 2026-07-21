@@ -1,4 +1,4 @@
-package Engine;
+package Engine.Math;
 
 import java.nio.FloatBuffer;
 
@@ -35,6 +35,15 @@ public class Matrix4f {
         components[14] = z;
     }
 
+    public void initRotation(Vector3f forward, Vector3f up, Vector3f right){
+        components[0] = right.getX();
+        components[1] = up.getX();
+        components[2] = forward.getX();
+        //...
+        components[15] = 1;
+
+    }
+
     public void initPerspective(float fov, float aspectRatio, float near, float far) {
         components[0] = 1 / (aspectRatio * (float) Math.tan(fov / 2));
         components[5] = 1 / ((float) Math.tan(fov / 2));
@@ -44,20 +53,20 @@ public class Matrix4f {
     }
 
     public Matrix4f add(Matrix4f m) {
-        Matrix4f result = new Matrix4f();
         for (int i = 0; i < components.length; i++) {
-            result.set(i, components[i] + m.get(i));
+            set(i, components[i] + m.get(i));
         }
-        return result;
+        return this;
     }
 
     public Matrix4f mul(Matrix4f m) {
-        Matrix4f result = new Matrix4f();
+        float[] result = new float[16];
         //Upper bits select row, lower bits select column
         for (int j = 0; j < LENGTH; j++) {
-            result.set(j, m.get((j & ~MOD)) * get((j & MOD)) + m.get(1 + (j & ~MOD)) * get(4 + (j & MOD)) + m.get(2 + (j & ~MOD)) * get(8 + (j & MOD)) + m.get(3 + (j & ~MOD)) * get(12 + (j & MOD)));
+            result[j] = m.get((j & ~MOD)) * get((j & MOD)) + m.get(1 + (j & ~MOD)) * get(4 + (j & MOD)) + m.get(2 + (j & ~MOD)) * get(8 + (j & MOD)) + m.get(3 + (j & ~MOD)) * get(12 + (j & MOD));
         }
-        return result;
+        components = result;
+        return this;
     }
 
     public void set(int row, int col, float val) {
@@ -81,9 +90,10 @@ public class Matrix4f {
     }
 
     public void put(FloatBuffer floatBuffer) {
-        for (int i = 0; i < LENGTH; i++) {
+        floatBuffer.put(components);
+        /*for (int i = 0; i < LENGTH; i++) {
             floatBuffer.put(components[i]);
-        }
+        }*/
     }
 
     public String toString() {
