@@ -16,32 +16,76 @@ public class Matrix4f {
 
     public Matrix4f() {
         this(new float[LENGTH]);
+        initIdentity();
     }
 
     public Matrix4f(float[] components) {
         this.components = components;
     }
 
-    public void initIdentity() {
+    public Matrix4f initIdentity() {
+        components[0] = 1;
+        components[1] = 0;
+        components[2] = 0;
+        components[3] = 0;
+        components[4] = 0;
+        components[5] = 1;
+        components[6] = 0;
+        components[7] = 0;
+        components[8] = 0;
+        components[9] = 0;
+        components[10] = 1;
+        components[11] = 0;
+        components[12] = 0;
+        components[13] = 0;
+        components[14] = 0;
+        components[15] = 1;
+        return this;
+    }
+
+    public Matrix4f initScale(Vector3f scaleVector) {
+        components[0] = scaleVector.getX();
+        components[5] = scaleVector.getY();
+        components[10] = scaleVector.getZ();
+        components[15] = 1;
+        return this;
+    }
+
+    public Matrix4f initScale(float scaleFactor) {
+        components[0] = scaleFactor;
+        components[5] = scaleFactor;
+        components[10] = scaleFactor;
+        components[15] = 1;
+        return this;
+    }
+
+    public Matrix4f initTranslation(Vector3f translationVector) {
         components[0] = 1;
         components[5] = 1;
         components[10] = 1;
+        components[12] = translationVector.getX();
+        components[13] = translationVector.getY();
+        components[14] = translationVector.getZ();
         components[15] = 1;
+        return this;
     }
 
-    public void initTranslation(float x, float y, float z) {
-        components[12] = x;
-        components[13] = y;
-        components[14] = z;
-    }
+    public void initRotation(Quaternionf q) {
+        assert q.lenSq() == 1;
+        float xx = q.getX() * q.getX();
+        float yy = q.getY() * q.getY();
+        float zz = q.getZ() * q.getZ();
 
-    public void initRotation(Vector3f forward, Vector3f up, Vector3f right){
-        components[0] = right.getX();
-        components[1] = up.getX();
-        components[2] = forward.getX();
-        //...
+        components[0] = 1 - 2 * (yy + zz);
+        components[1] = 2 * (q.getX() * q.getY() + q.getW() * q.getZ());
+        components[2] = 2 * (q.getX() * q.getZ() - q.getW() * q.getY());
+        components[4] = 2 * (q.getX() * q.getY() - q.getW() * q.getZ());
+        components[5] = 1 - 2 * (xx + zz);
+        components[6] = 2 * (q.getW() * q.getX() + q.getY() * q.getZ());
+        components[8] = 2 * (q.getW() * q.getY() + q.getX() * q.getZ());
+        components[9] = 2 * (q.getY() * q.getZ() - q.getW() * q.getX());
+        components[10] = 1 - 2 * (xx + yy);
         components[15] = 1;
-
     }
 
     public void initPerspective(float fov, float aspectRatio, float near, float far) {
@@ -69,12 +113,35 @@ public class Matrix4f {
         return this;
     }
 
+    public Matrix4f scale(float scale) {
+        Matrix4f scaleMatrix = new Matrix4f();
+        scaleMatrix.initScale(scale);
+        return this.mul(scaleMatrix);
+    }
+
+    public Matrix4f rotate(Quaternionf rotation) {
+        Matrix4f rotationMatrix = new Matrix4f();
+        rotationMatrix.initRotation(rotation);
+        return this.mul(rotationMatrix);
+    }
+
+    public Matrix4f translate(Vector3f translation) {
+        Matrix4f translationMatrix = new Matrix4f();
+        translationMatrix.initTranslation(translation);
+        return this.mul(translationMatrix);
+    }
+
     public void set(int row, int col, float val) {
         set(row + (col * SIZE), val);
     }
 
     private void set(int i, float val) {
         components[i] = val;
+    }
+
+    private Matrix4f set(Matrix4f m) {
+        System.arraycopy(m.components, 0, components, 0, LENGTH);
+        return this;
     }
 
     public float get(int row, int col) {
@@ -91,9 +158,6 @@ public class Matrix4f {
 
     public void put(FloatBuffer floatBuffer) {
         floatBuffer.put(components);
-        /*for (int i = 0; i < LENGTH; i++) {
-            floatBuffer.put(components[i]);
-        }*/
     }
 
     public String toString() {

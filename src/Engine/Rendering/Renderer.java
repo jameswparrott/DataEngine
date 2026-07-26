@@ -4,6 +4,7 @@ import Engine.Window;
 import org.lwjgl.opengl.GL;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -16,6 +17,7 @@ public class Renderer {
 
     public Renderer() {
         GL.createCapabilities();
+        glEnable(GL_DEPTH_TEST);
         List<ShaderData> shaderDataList = new ArrayList<>();
         shaderDataList.add(new ShaderData("res/shaders/vertex.glsl", GL_VERTEX_SHADER));
         shaderDataList.add(new ShaderData("res/shaders/fragment.glsl", GL_FRAGMENT_SHADER));
@@ -26,17 +28,24 @@ public class Renderer {
 
     public void createUniforms() {
         uniformMap.createUniform("projection");
+        uniformMap.createUniform("model");
     }
 
     public void render(Window window, Scene scene) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         shaderProgram.bind();
         uniformMap.setUniform("projection", scene.getProjection());
-        scene.getMeshMap().values().forEach(mesh -> {
-            glBindVertexArray(mesh.getVaoId());
-            shaderProgram.validate();
-            glDrawElements(GL_TRIANGLES, mesh.getNumVertices(), GL_UNSIGNED_INT, 0);
-        });
+        Collection<Model> models = scene.getModelMap().values();
+        for (Model model : models) {
+            model.getMeshList().forEach(mesh -> {
+                glBindVertexArray(mesh.getVaoId());
+                List<Entity> entities = model.getEntityList();
+                for (Entity entity : entities) {
+                    uniformMap.setUniform("model", entity.getModelMatrix());
+                    glDrawElements(GL_TRIANGLES, mesh.getNumVertices(), GL_UNSIGNED_INT, 0);
+                }
+            });
+        }
         glBindVertexArray(0);
         shaderProgram.unbind();
     }

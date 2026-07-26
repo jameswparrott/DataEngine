@@ -5,11 +5,7 @@ public class Quaternionf {
     private float w, x, y, z;
 
     public Quaternionf() {
-        this(0.0f, 0.0f, 0.0f, 0.0f);
-    }
-
-    public Quaternionf(float scalarPart, Vector3f vectorPart) {
-        this(scalarPart, vectorPart.getX(), vectorPart.getY(), vectorPart.getZ());
+        this(1.0f, 0.0f, 0.0f, 0.0f);
     }
 
     public Quaternionf(float w, float x, float y, float z) {
@@ -75,6 +71,18 @@ public class Quaternionf {
 
     public Vector3f getVectorPart() {
         return new Vector3f(x, y, z);
+    }
+
+    public Matrix4f toRotationMatrix() {
+        return new Matrix4f();
+    }
+
+    public Quaternionf set(Quaternionf q) {
+        this.w = q.w;
+        this.x = q.x;
+        this.y = q.y;
+        this.z = q.z;
+        return this;
     }
 
     public float getX() {

@@ -50,14 +50,29 @@ public class Vector3f {
         return new Vector3f(y * v.z - v.y * z, z * v.x - v.z * x, x * v.y - v.x * y);
     }
 
-    public Vector3f rotate(Quaternionf q) {
-        return q.mul(new Quaternionf(0, this)).mul(q).getVectorPart();
-    }
-
     public void put(FloatBuffer vectorBuffer) {
         vectorBuffer.put(x);
         vectorBuffer.put(y);
         vectorBuffer.put(z);
+    }
+
+    public void setX(float x) {
+        this.x = x;
+    }
+
+    public void setY(float y) {
+        this.y = y;
+    }
+
+    public void setZ(float z) {
+        this.z = z;
+    }
+
+    public Vector3f set(Vector3f v) {
+        this.x = v.x;
+        this.y = v.y;
+        this.z = v.z;
+        return this;
     }
 
     public float getX() {

@@ -13,21 +13,29 @@ public class Scene {
 
     private Matrix4f projection;
 
-    private Map<String, Mesh> meshMap;
+    private Map<String, Model> modelMap;
 
     public Scene(int width, int height) {
-        meshMap = new HashMap<>();
+        modelMap = new HashMap<>();
         projection = new Matrix4f();
         projection.initPerspective(FOV, (float) width / height, Z_NEAR, Z_FAR);
-        System.out.println(projection);
     }
 
-    public void addMesh(String meshId, Mesh mesh) {
-        meshMap.put(meshId, mesh);
+    public void addEntity(Entity entity) {
+        String modelId = entity.getModelId();
+        Model model = modelMap.get(modelId);
+        if (model == null) {
+            throw new RuntimeException("Could not find model [" + modelId + "]");
+        }
+        model.getEntityList().add(entity);
     }
 
-    public Map<String, Mesh> getMeshMap() {
-        return meshMap;
+    public void addModel(Model model) {
+        modelMap.put(model.getId(), model);
+    }
+
+    public Map<String, Model> getModelMap() {
+        return modelMap;
     }
 
     public void resize(int width, int height) {
@@ -39,7 +47,7 @@ public class Scene {
     }
 
     public void cleanup() {
-
+        modelMap.values().forEach(Model::cleanup);
     }
 
 }

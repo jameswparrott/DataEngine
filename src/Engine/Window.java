@@ -1,5 +1,7 @@
 package Engine;
 
+import org.lwjgl.glfw.GLFWFramebufferSizeCallback;
+import org.lwjgl.glfw.GLFWKeyCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.system.MemoryUtil;
@@ -16,7 +18,7 @@ public class Window {
     private final long windowHandle;
     private int windowHeight;
     private int windowWidth;
-    private Callable<Void> resizeFunction;
+    private final Callable<Void> resizeFunction;
 
     public Window(WindowData windowData, Callable<Void> resizeFunction) {
 
@@ -44,8 +46,10 @@ public class Window {
         } else {
             glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
             GLFWVidMode vidMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-            windowWidth = vidMode.width();
-            windowHeight = vidMode.height();
+            if (vidMode != null) {
+                windowWidth = vidMode.width();
+                windowHeight = vidMode.height();
+            }
         }
 
         windowHandle = glfwCreateWindow(windowWidth, windowHeight, windowData.title(), NULL, NULL);
@@ -54,9 +58,7 @@ public class Window {
         }
 
         glfwSetFramebufferSizeCallback(windowHandle, (window, w, h) -> resized(w, h));
-
         glfwSetErrorCallback((int errorCode, long msgPtr) -> System.err.println("Error code: " + errorCode + ", msg: " + MemoryUtil.memUTF8(msgPtr)));
-
         glfwSetKeyCallback(windowHandle, (window, key, scancode, action, mods) -> {
             keyCallBack(key, action);
         });
@@ -76,7 +78,6 @@ public class Window {
         glfwGetFramebufferSize(windowHandle, arrWidth, arrHeight);
         windowWidth = arrWidth[0];
         windowHeight = arrHeight[0];
-
     }
 
     protected void resized(int width, int height) {
