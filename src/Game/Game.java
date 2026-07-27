@@ -13,11 +13,13 @@ import static org.lwjgl.glfw.GLFW.*;
 public class Game implements IEngineLogic {
 
     Entity entity;
+    float scale;
     Vector3f position;
     Quaternionf rotation;
     final static Vector3f Y_AXIS = new Vector3f(0, 1, 0);
     final static Vector3f XYZ_AXES = new Vector3f(0.5f, 1, 1.2f);
     float angle = 0.0f;
+    float multiple;
 
     public Game() {
 
@@ -69,6 +71,8 @@ public class Game implements IEngineLogic {
 
         XYZ_AXES.norm();
 
+        scale = 0;
+        multiple = 0;
         position = new Vector3f(0.0f, 0.0f, -5.0f);
         rotation = new Quaternionf();
 
@@ -82,26 +86,29 @@ public class Game implements IEngineLogic {
     @Override
     public void input(Window window, Scene scene, long deltaTimeMillis) {
         float delta = (float) deltaTimeMillis / 1000.0f;
-        if (window.isKeyPressed(GLFW_KEY_W)){
-            position.setY(10f * delta + entity.getPosition().getY());
+        if (window.isKeyPressed(GLFW_KEY_W)) {
+            position.setY(5f * delta + entity.getPosition().getY());
         }
-        if (window.isKeyPressed(GLFW_KEY_S)){
-            position.setY(-10f * delta + entity.getPosition().getY());
+        if (window.isKeyPressed(GLFW_KEY_S)) {
+            position.setY(-5f * delta + entity.getPosition().getY());
         }
-        if (window.isKeyPressed(GLFW_KEY_A)){
-            position.setX(-10f * delta + entity.getPosition().getX());
+        if (window.isKeyPressed(GLFW_KEY_A)) {
+            position.setX(-5f * delta + entity.getPosition().getX());
         }
-        if (window.isKeyPressed(GLFW_KEY_D)){
-            position.setX(10f * delta + entity.getPosition().getX());
+        if (window.isKeyPressed(GLFW_KEY_D)) {
+            position.setX(5f * delta + entity.getPosition().getX());
         }
-        if (window.isKeyPressed(GLFW_KEY_Q)){
-            position.setZ(-10f * delta + entity.getPosition().getZ());
+        if (window.isKeyPressed(GLFW_KEY_Q)) {
+            position.setZ(-5f * delta + entity.getPosition().getZ());
         }
-        if (window.isKeyPressed(GLFW_KEY_E)){
-            position.setZ(10f * delta + entity.getPosition().getZ());
+        if (window.isKeyPressed(GLFW_KEY_E)) {
+            position.setZ(5f * delta + entity.getPosition().getZ());
         }
         angle += 5f * delta;
+        multiple += delta;
         rotation.initRotation(angle, XYZ_AXES);
+        scale = 1.5f + (float) Math.sin(Math.PI * multiple);
+        entity.setScale(scale);
         entity.setRotation(rotation);
         entity.setPosition(position);
     }

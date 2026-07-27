@@ -36,11 +36,10 @@ public class Entity {
     }
 
     public void updateModelMatrix() {
-        modelMatrix.initIdentity();
+        modelMatrix.identity();
         modelMatrix.translate(position);
         modelMatrix.rotate(rotation);
         modelMatrix.scale(scale);
-        //this.modelMatrix.initIdentity().translate(position).rotate(rotation).scale(scale);
     }
 
     public String getId() {

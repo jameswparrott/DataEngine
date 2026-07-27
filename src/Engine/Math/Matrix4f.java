@@ -16,14 +16,17 @@ public class Matrix4f {
 
     public Matrix4f() {
         this(new float[LENGTH]);
-        initIdentity();
+        components[0] = 1;
+        components[5] = 1;
+        components[10] = 1;
+        components[15] = 1;
     }
 
     public Matrix4f(float[] components) {
         this.components = components;
     }
 
-    public Matrix4f initIdentity() {
+    public void identity() {
         components[0] = 1;
         components[1] = 0;
         components[2] = 0;
@@ -40,34 +43,18 @@ public class Matrix4f {
         components[13] = 0;
         components[14] = 0;
         components[15] = 1;
-        return this;
     }
 
-    public Matrix4f initScale(Vector3f scaleVector) {
-        components[0] = scaleVector.getX();
-        components[5] = scaleVector.getY();
-        components[10] = scaleVector.getZ();
-        components[15] = 1;
-        return this;
-    }
-
-    public Matrix4f initScale(float scaleFactor) {
+    public void initScale(float scaleFactor) {
         components[0] = scaleFactor;
         components[5] = scaleFactor;
         components[10] = scaleFactor;
-        components[15] = 1;
-        return this;
     }
 
-    public Matrix4f initTranslation(Vector3f translationVector) {
-        components[0] = 1;
-        components[5] = 1;
-        components[10] = 1;
+    public void initTranslation(Vector3f translationVector) {
         components[12] = translationVector.getX();
         components[13] = translationVector.getY();
         components[14] = translationVector.getZ();
-        components[15] = 1;
-        return this;
     }
 
     public void initRotation(Quaternionf q) {
@@ -85,7 +72,6 @@ public class Matrix4f {
         components[8] = 2 * (q.getW() * q.getY() + q.getX() * q.getZ());
         components[9] = 2 * (q.getY() * q.getZ() - q.getW() * q.getX());
         components[10] = 1 - 2 * (xx + yy);
-        components[15] = 1;
     }
 
     public void initPerspective(float fov, float aspectRatio, float near, float far) {
@@ -98,7 +84,7 @@ public class Matrix4f {
 
     public Matrix4f add(Matrix4f m) {
         for (int i = 0; i < components.length; i++) {
-            set(i, components[i] + m.get(i));
+            components[i] += m.components[i];
         }
         return this;
     }
@@ -114,21 +100,64 @@ public class Matrix4f {
     }
 
     public Matrix4f scale(float scale) {
-        Matrix4f scaleMatrix = new Matrix4f();
-        scaleMatrix.initScale(scale);
-        return this.mul(scaleMatrix);
+        components[0] *= scale;
+        components[1] *= scale;
+        components[2] *= scale;
+        components[3] *= scale;
+        components[4] *= scale;
+        components[5] *= scale;
+        components[6] *= scale;
+        components[7] *= scale;
+        components[8] *= scale;
+        components[9] *= scale;
+        components[10] *= scale;
+        components[11] *= scale;
+        return this;
     }
 
     public Matrix4f rotate(Quaternionf rotation) {
-        Matrix4f rotationMatrix = new Matrix4f();
-        rotationMatrix.initRotation(rotation);
-        return this.mul(rotationMatrix);
+        assert rotation.lenSq() == 1;
+        float xx = rotation.getX() * rotation.getX();
+        float yy = rotation.getY() * rotation.getY();
+        float zz = rotation.getZ() * rotation.getZ();
+        float wx = rotation.getW() * rotation.getX();
+        float wy = rotation.getW() * rotation.getY();
+        float wz = rotation.getW() * rotation.getZ();
+        float xy = rotation.getX() * rotation.getY();
+        float xz = rotation.getX() * rotation.getZ();
+        float yz = rotation.getY() * rotation.getZ();
+
+        float a, b;
+        a = (1 - 2 * (yy + zz)) * components[0] + (2 * (xy + wz)) * components[4] + (2 * (xz - wy)) * components[8];
+        b = (2 * (xy - wz)) * components[0] + (1 - 2 * (xx + zz)) * components[4] + (2 * (wx + yz)) * components[8];
+        components[8] = (2 * (wy + xz)) * components[0] + (2 * (yz - wx)) * components[4] + (1 - 2 * (xx + yy)) * components[8];
+        components[4] = b;
+        components[0] = a;
+        a = (1 - 2 * (yy + zz)) * components[1] + (2 * (xy + wz)) * components[5] + (2 * (xz - wy)) * components[9];
+        b = (2 * (xy - wz)) * components[1] + (1 - 2 * (xx + zz)) * components[5] + (2 * (wx + yz)) * components[9];
+        components[9] = (2 * (wy + xz)) * components[1] + (2 * (yz - wx)) * components[5] + (1 - 2 * (xx + yy)) * components[9];
+        components[5] = b;
+        components[1] = a;
+        a = (1 - 2 * (yy + zz)) * components[2] + (2 * (xy + wz)) * components[6] + (2 * (xz - wy)) * components[10];
+        b = (2 * (xy - wz)) * components[2] + (1 - 2 * (xx + zz)) * components[6] + (2 * (wx + yz)) * components[10];
+        components[10] = (2 * (wy + xz)) * components[2] + (2 * (yz - wx)) * components[6] + (1 - 2 * (xx + yy)) * components[10];
+        components[6] = b;
+        components[2] = a;
+        a = (1 - 2 * (yy + zz)) * components[3] + (2 * (xy + wz)) * components[7] + (2 * (xz - wy)) * components[11];
+        b = (2 * (xy - wz)) * components[3] + (1 - 2 * (xx + zz)) * components[7] + (2 * (wx + yz)) * components[11];
+        components[11] = (2 * (wy + xz)) * components[3] + (2 * (yz - wx)) * components[7] + (1 - 2 * (xx + yy)) * components[11];
+        components[7] = b;
+        components[3] = a;
+
+        return this;
     }
 
     public Matrix4f translate(Vector3f translation) {
-        Matrix4f translationMatrix = new Matrix4f();
-        translationMatrix.initTranslation(translation);
-        return this.mul(translationMatrix);
+        components[12] += components[0] * translation.getX() + components[4] * translation.getY() + components[8] * translation.getZ();
+        components[13] += components[1] * translation.getX() + components[5] * translation.getY() + components[9] * translation.getZ();
+        components[14] += components[2] * translation.getX() + components[6] * translation.getY() + components[10] * translation.getZ();
+        components[15] += components[3] * translation.getX() + components[7] * translation.getY() + components[11] * translation.getZ();
+        return this;
     }
 
     public void set(int row, int col, float val) {
