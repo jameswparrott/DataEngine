@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 public class TextureCache {
 
-    public static final String DEFAULT_TEXTURE = "res/textures/default_texture.png";
+    public static final String DEFAULT_TEXTURE = "rsc/textures/default_texture.png";
 
     private HashMap<String, Texture> textureMap;
 

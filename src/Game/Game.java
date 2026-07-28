@@ -82,7 +82,7 @@ public class Game implements IEngineLogic {
                 20, 21, 22, 22, 23, 20  // Bottom
         };
 
-        Texture texture = scene.addTexture("res/textures/default_texture.png");
+        Texture texture = scene.addTexture("rsc/textures/default_texture.png");
         Mesh mesh = new Mesh(new MeshData(positions, texCoords, indices));
         Material material = new Material();
         material.setTexturePath(texture.getTexturePath());
