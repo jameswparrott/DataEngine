@@ -6,7 +6,6 @@ import Engine.Math.Vector3f;
 import Engine.Rendering.*;
 import Engine.Window;
 
-import java.sql.Array;
 import java.util.ArrayList;
 
 import static org.lwjgl.glfw.GLFW.*;

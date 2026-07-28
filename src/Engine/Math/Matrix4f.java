@@ -91,15 +91,22 @@ public class Matrix4f {
 
     public Matrix4f mul(Matrix4f m) {
         float[] result = new float[16];
-        //Upper bits select row, lower bits select column
+        int row;
+        int col;
         for (int j = 0; j < LENGTH; j++) {
-            result[j] = m.get((j & ~MOD)) * get((j & MOD)) + m.get(1 + (j & ~MOD)) * get(4 + (j & MOD)) + m.get(2 + (j & ~MOD)) * get(8 + (j & MOD)) + m.get(3 + (j & ~MOD)) * get(12 + (j & MOD));
+            //Upper bits select row, lower bits select column
+            row = j & ~MOD;
+            col = j & MOD;
+            result[j] = m.components[row] * components[col] +
+                        m.components[1 + row] * components[4 + col] +
+                        m.components[2 + row] * components[8 + col] +
+                        m.components[3 + row] * components[12 + col];
         }
         components = result;
         return this;
     }
 
-    public Matrix4f scale(float scale) {
+    public void scale(float scale) {
         components[0] *= scale;
         components[1] *= scale;
         components[2] *= scale;
@@ -112,10 +119,9 @@ public class Matrix4f {
         components[9] *= scale;
         components[10] *= scale;
         components[11] *= scale;
-        return this;
     }
 
-    public Matrix4f rotate(Quaternionf rotation) {
+    public void rotate(Quaternionf rotation) {
         assert rotation.lenSq() == 1;
         float xx = rotation.getX() * rotation.getX();
         float yy = rotation.getY() * rotation.getY();
@@ -126,38 +132,50 @@ public class Matrix4f {
         float xy = rotation.getX() * rotation.getY();
         float xz = rotation.getX() * rotation.getZ();
         float yz = rotation.getY() * rotation.getZ();
-
         float a, b;
         a = (1 - 2 * (yy + zz)) * components[0] + (2 * (xy + wz)) * components[4] + (2 * (xz - wy)) * components[8];
         b = (2 * (xy - wz)) * components[0] + (1 - 2 * (xx + zz)) * components[4] + (2 * (wx + yz)) * components[8];
-        components[8] = (2 * (wy + xz)) * components[0] + (2 * (yz - wx)) * components[4] + (1 - 2 * (xx + yy)) * components[8];
+        components[8] = (2 * (wy + xz)) * components[0] +
+                        (2 * (yz - wx)) * components[4] +
+                        (1 - 2 * (xx + yy)) * components[8];
         components[4] = b;
         components[0] = a;
         a = (1 - 2 * (yy + zz)) * components[1] + (2 * (xy + wz)) * components[5] + (2 * (xz - wy)) * components[9];
         b = (2 * (xy - wz)) * components[1] + (1 - 2 * (xx + zz)) * components[5] + (2 * (wx + yz)) * components[9];
-        components[9] = (2 * (wy + xz)) * components[1] + (2 * (yz - wx)) * components[5] + (1 - 2 * (xx + yy)) * components[9];
+        components[9] = (2 * (wy + xz)) * components[1] +
+                        (2 * (yz - wx)) * components[5] +
+                        (1 - 2 * (xx + yy)) * components[9];
         components[5] = b;
         components[1] = a;
         a = (1 - 2 * (yy + zz)) * components[2] + (2 * (xy + wz)) * components[6] + (2 * (xz - wy)) * components[10];
         b = (2 * (xy - wz)) * components[2] + (1 - 2 * (xx + zz)) * components[6] + (2 * (wx + yz)) * components[10];
-        components[10] = (2 * (wy + xz)) * components[2] + (2 * (yz - wx)) * components[6] + (1 - 2 * (xx + yy)) * components[10];
+        components[10] = (2 * (wy + xz)) * components[2] +
+                         (2 * (yz - wx)) * components[6] +
+                         (1 - 2 * (xx + yy)) * components[10];
         components[6] = b;
         components[2] = a;
         a = (1 - 2 * (yy + zz)) * components[3] + (2 * (xy + wz)) * components[7] + (2 * (xz - wy)) * components[11];
         b = (2 * (xy - wz)) * components[3] + (1 - 2 * (xx + zz)) * components[7] + (2 * (wx + yz)) * components[11];
-        components[11] = (2 * (wy + xz)) * components[3] + (2 * (yz - wx)) * components[7] + (1 - 2 * (xx + yy)) * components[11];
+        components[11] = (2 * (wy + xz)) * components[3] +
+                         (2 * (yz - wx)) * components[7] +
+                         (1 - 2 * (xx + yy)) * components[11];
         components[7] = b;
         components[3] = a;
-
-        return this;
     }
 
-    public Matrix4f translate(Vector3f translation) {
-        components[12] += components[0] * translation.getX() + components[4] * translation.getY() + components[8] * translation.getZ();
-        components[13] += components[1] * translation.getX() + components[5] * translation.getY() + components[9] * translation.getZ();
-        components[14] += components[2] * translation.getX() + components[6] * translation.getY() + components[10] * translation.getZ();
-        components[15] += components[3] * translation.getX() + components[7] * translation.getY() + components[11] * translation.getZ();
-        return this;
+    public void translate(Vector3f translation) {
+        components[12] += components[0] * translation.getX() +
+                          components[4] * translation.getY() +
+                          components[8] * translation.getZ();
+        components[13] += components[1] * translation.getX() +
+                          components[5] * translation.getY() +
+                          components[9] * translation.getZ();
+        components[14] += components[2] * translation.getX() +
+                          components[6] * translation.getY() +
+                          components[10] * translation.getZ();
+        components[15] += components[3] * translation.getX() +
+                          components[7] * translation.getY() +
+                          components[11] * translation.getZ();
     }
 
     public void set(int row, int col, float val) {
@@ -174,11 +192,7 @@ public class Matrix4f {
     }
 
     public float get(int row, int col) {
-        return get(row + (col * SIZE));
-    }
-
-    private float get(int i) {
-        return components[i];
+        return components[row + (col * SIZE)];
     }
 
     public float[] getComponents() {
@@ -190,10 +204,10 @@ public class Matrix4f {
     }
 
     public String toString() {
-        return "[" + get(0) + ", " + get(4) + ", " + get(8) + ", " + get(12) + "]\n" +
-                "[" + get(1) + ", " + get(5) + ", " + get(9) + ", " + get(13) + "]\n" +
-                "[" + get(2) + ", " + get(6) + ", " + get(10) + ", " + get(14) + "]\n" +
-                "[" + get(3) + ", " + get(7) + ", " + get(11) + ", " + get(15) + "]";
+        return "[" + components[0] + ", " + components[4] + ", " + components[8] + ", " + components[12] + "]\n" +
+               "[" + components[1] + ", " + components[5] + ", " + components[9] + ", " + components[13] + "]\n" +
+               "[" + components[2] + ", " + components[6] + ", " + components[10] + ", " + components[14] + "]\n" +
+               "[" + components[3] + ", " + components[7] + ", " + components[11] + ", " + components[15] + "]";
     }
 
 }
