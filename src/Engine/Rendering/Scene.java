@@ -14,8 +14,10 @@ public class Scene {
     private Matrix4f projection;
 
     private Map<String, Model> modelMap;
+    private TextureCache textureCache;
 
     public Scene(int width, int height) {
+        textureCache = new TextureCache();
         modelMap = new HashMap<>();
         projection = new Matrix4f();
         projection.initPerspective(FOV, (float) width / height, Z_NEAR, Z_FAR);
@@ -34,12 +36,20 @@ public class Scene {
         modelMap.put(model.getId(), model);
     }
 
-    public Map<String, Model> getModelMap() {
-        return modelMap;
+    public Texture addTexture(String texPath) {
+        return textureCache.createTexture(texPath);
     }
 
     public void resize(int width, int height) {
         projection.initPerspective(FOV, (float) width / height, Z_NEAR, Z_FAR);
+    }
+
+    public TextureCache getTextureCache() {
+        return textureCache;
+    }
+
+    public Map<String, Model> getModelMap() {
+        return modelMap;
     }
 
     public Matrix4f getProjection() {

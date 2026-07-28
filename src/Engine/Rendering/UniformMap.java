@@ -7,8 +7,7 @@ import java.nio.FloatBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.lwjgl.opengl.GL20.glGetUniformLocation;
-import static org.lwjgl.opengl.GL20.glUniformMatrix4fv;
+import static org.lwjgl.opengl.GL20.*;
 
 public class UniformMap {
 
@@ -30,15 +29,23 @@ public class UniformMap {
         uniforms.put(uniformName, uniformLocation);
     }
 
-    public void setUniform(String uniformName, Matrix4f matrix) {
+    public int getUniformLocation(String uniformName) {
         Integer location = uniforms.get(uniformName);
         if (location == null) {
             throw new RuntimeException("Could not find uniform [" + uniformName + "].");
         }
+        return location;
+    }
+
+    public void setUniform(String uniformName, Matrix4f matrix) {
         matrixBuffer.clear();
         matrix.put(matrixBuffer);
         matrixBuffer.flip();
-        glUniformMatrix4fv(location, false, matrixBuffer);
+        glUniformMatrix4fv(getUniformLocation(uniformName), false, matrixBuffer);
+    }
+
+    public void setUniform(String uniformName, int value) {
+        glUniform1i(getUniformLocation(uniformName), value);
     }
 
     public void cleanup() {

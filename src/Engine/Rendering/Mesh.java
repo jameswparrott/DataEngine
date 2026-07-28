@@ -36,18 +36,18 @@ public class Mesh {
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         MemoryUtil.memFree(positionsBuffer);
 
-        //Color VBO
+        //Texture Coordinates VBO
         vboId = glGenBuffers();
         vboIdList.add(vboId);
 
-        FloatBuffer colorsBuffer = MemoryUtil.memCallocFloat(meshData.colors().length);
-        colorsBuffer.put(0, meshData.colors());
+        FloatBuffer texCoordsBuffer = MemoryUtil.memCallocFloat(meshData.texCoords().length);
+        texCoordsBuffer.put(0, meshData.texCoords());
         glBindBuffer(GL_ARRAY_BUFFER, vboId);
-        glBufferData(GL_ARRAY_BUFFER, colorsBuffer, GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, texCoordsBuffer, GL_STATIC_DRAW);
         glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 3, GL_FLOAT, false, 0, 0);
+        glVertexAttribPointer(1, 2, GL_FLOAT, false, 0, 0);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
-        MemoryUtil.memFree(colorsBuffer);
+        MemoryUtil.memFree(texCoordsBuffer);
 
         //Index VBO
         vboId = glGenBuffers();
@@ -57,7 +57,7 @@ public class Mesh {
         indicesBuffer.put(0, meshData.indices());
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboId);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicesBuffer, GL_STATIC_DRAW);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindBuffer(GL_ARRAY_BUFFER, 0); //TODO: Only unbind buffer once
         MemoryUtil.memFree(indicesBuffer);
 
         glBindVertexArray(0); //Unbind VAO

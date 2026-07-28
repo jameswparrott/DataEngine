@@ -6,6 +6,7 @@ import Engine.Math.Vector3f;
 import Engine.Rendering.*;
 import Engine.Window;
 
+import java.sql.Array;
 import java.util.ArrayList;
 
 import static org.lwjgl.glfw.GLFW.*;
@@ -28,49 +29,73 @@ public class Game implements IEngineLogic {
     @Override
     public void init(Window window, Scene scene, Renderer renderer) {
         float[] positions = new float[]{
-                -0.5f, 0.5f, -0.5f, //V0
-                -0.5f, -0.5f, -0.5f, //V1
-                0.5f, -0.5f, -0.5f, //V2
-                0.5f, 0.5f, -0.5f, //V3
-                0.5f, -0.5f, 0.5f, //V4
-                0.5f, 0.5f, 0.5f, //V5
-                -0.5f, -0.5f, 0.5f, //V6
-                -0.5f, 0.5f, 0.5f, //V7
+                // Front
+                -1, -1, 1,
+                1, -1, 1,
+                1, 1, 1,
+                -1, 1, 1,
 
+                // Back
+                1, -1, -1,
+                -1, -1, -1,
+                -1, 1, -1,
+                1, 1, -1,
+
+                // Left
+                -1, -1, -1,
+                -1, -1, 1,
+                -1, 1, 1,
+                -1, 1, -1,
+
+                // Right
+                1, -1, 1,
+                1, -1, -1,
+                1, 1, -1,
+                1, 1, 1,
+
+                // Top
+                -1, 1, 1,
+                1, 1, 1,
+                1, 1, -1,
+                -1, 1, -1,
+
+                // Bottom
+                -1, -1, -1,
+                1, -1, -1,
+                1, -1, 1,
+                -1, -1, 1
         };
-        float[] colors = new float[]{
-                0.5f, 0.0f, 0.0f, //R
-                0.0f, 0.5f, 0.0f, //G
-                0.0f, 0.0f, 0.5f, //B
-                0.0f, 0.5f, 0.0f, //G
-                0.0f, 0.5f, 0.0f, //G
-                0.5f, 0.0f, 0.0f, //R
-                0.0f, 0.0f, 0.5f, //B
-                0.0f, 0.5f, 0.0f  //G
+        float[] texCoords = new float[]{
+                0, 0, 1, 0, 1, 1, 0, 1,
+                0, 0, 1, 0, 1, 1, 0, 1,
+                0, 0, 1, 0, 1, 1, 0, 1,
+                0, 0, 1, 0, 1, 1, 0, 1,
+                0, 0, 1, 0, 1, 1, 0, 1,
+                0, 0, 1, 0, 1, 1, 0, 1
         };
         int[] indices = new int[]{
-                0, 1, 3,
-                1, 2, 3,
-                3, 2, 5,
-                5, 2, 4,
-                5, 4, 6,
-                6, 7, 5,
-                7, 6, 1,
-                1, 0, 7,
-                7, 0, 3,
-                3, 5, 7,
-                1, 6, 2,
-                2, 6, 4
+                0, 1, 2, 2, 3, 0, // Front
+                4, 5, 6, 6, 7, 4, // Back
+                8, 9, 10, 10, 11, 8, // Left
+                12, 13, 14, 14, 15, 12, // Right
+                16, 17, 18, 18, 19, 16, // Top
+                20, 21, 22, 22, 23, 20  // Bottom
         };
-        Mesh mesh = new Mesh(new MeshData(positions, colors, indices));
-        ArrayList<Mesh> meshList = new ArrayList<>();
-        meshList.add(mesh);
+
+        Texture texture = scene.addTexture("res/textures/default_texture.png");
+        Mesh mesh = new Mesh(new MeshData(positions, texCoords, indices));
+        Material material = new Material();
+        material.setTexturePath(texture.getTexturePath());
+        ArrayList<Material> materialList = new ArrayList<>();
+        material.addMesh(mesh);
+        materialList.add(material);
+
         String modelId = "cubeModel";
-        Model model = new Model(modelId, meshList);
+
+        Model model = new Model(modelId, materialList);
         scene.addModel(model);
 
         XYZ_AXES.norm();
-
         scale = 0;
         multiple = 0;
         position = new Vector3f(0.0f, 0.0f, -5.0f);
@@ -106,7 +131,7 @@ public class Game implements IEngineLogic {
         }
         angle += 5f * delta;
         multiple += delta;
-        rotation.initRotation(angle, XYZ_AXES);
+        rotation.initRotation(angle, Y_AXIS);
         scale = 1.5f + (float) Math.sin(Math.PI * multiple);
         entity.setScale(scale);
         entity.setRotation(rotation);

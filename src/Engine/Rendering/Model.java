@@ -7,11 +7,11 @@ public class Model {
 
     private final String id;
     private List<Entity> entityList;
-    private List<Mesh> meshList;
+    private List<Material> materialList;
 
-    public Model(String id, List<Mesh> meshList) {
+    public Model(String id, List<Material> materialList) {
         this.id = id;
-        this.meshList = meshList;
+        this.materialList = materialList;
         entityList = new ArrayList<>();
     }
 
@@ -23,12 +23,12 @@ public class Model {
         return entityList;
     }
 
-    public List<Mesh> getMeshList() {
-        return meshList;
+    public List<Material> getMaterialList() {
+        return materialList;
     }
 
     public void cleanup() {
-        meshList.forEach(Mesh::cleanup);
+        materialList.forEach(Material::cleanup);
     }
 
 }
