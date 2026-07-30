@@ -33,6 +33,10 @@ public class Quaternionf {
         return w * w + x * x + y * y + z * z;
     }
 
+    public Quaternionf norm() {
+        return scale(1 / len());
+    }
+
     public Quaternionf conj() {
         x = -x;
         y = -y;
@@ -71,10 +75,6 @@ public class Quaternionf {
 
     public Vector3f getVectorPart() {
         return new Vector3f(x, y, z);
-    }
-
-    public Matrix4f toRotationMatrix() {
-        return new Matrix4f();
     }
 
     public Quaternionf set(Quaternionf q) {

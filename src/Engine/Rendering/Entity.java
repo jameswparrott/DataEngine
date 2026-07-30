@@ -35,11 +35,8 @@ public class Entity {
         this.rotation.set(rotation);
     }
 
-    public void updateModelMatrix() {
-        modelMatrix.identity();
-        modelMatrix.translate(position);
-        modelMatrix.rotate(rotation);
-        modelMatrix.scale(scale);
+    public void updateModel() {
+        modelMatrix.identity().translate(position).rotate(rotation).scale(scale);
     }
 
     public String getId() {

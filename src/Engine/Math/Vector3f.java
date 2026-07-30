@@ -46,14 +46,20 @@ public class Vector3f {
         return x * v.x + y * v.y + z * v.z;
     }
 
-    public Vector3f cross(Vector3f v) {
-        return new Vector3f(y * v.z - v.y * z, z * v.x - v.z * x, x * v.y - v.x * y);
+    public Vector3f cross(Vector3f u, Vector3f v){
+        float a = u.y * v.z - v.y * u.z;
+        float b = u.z * v.x - v.z * u.x;
+        float c = u.x * v.y - v.x * u.y;
+        x = a;
+        y = b;
+        z = c;
+        return this;
     }
 
-    public void put(FloatBuffer vectorBuffer) {
-        vectorBuffer.put(x);
-        vectorBuffer.put(y);
-        vectorBuffer.put(z);
+    public void put(FloatBuffer floatBuffer) {
+        floatBuffer.put(x);
+        floatBuffer.put(y);
+        floatBuffer.put(z);
     }
 
     public void setX(float x) {

@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.List;
 
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11C.GL_CCW;
 import static org.lwjgl.opengl.GL30.*;
 
 public class Renderer {
@@ -17,6 +18,9 @@ public class Renderer {
 
     public Renderer() {
         GL.createCapabilities();
+        glFrontFace(GL_CCW);
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
         glEnable(GL_DEPTH_TEST);
         List<ShaderData> shaderDataList = new ArrayList<>();
         shaderDataList.add(new ShaderData("rsc/shaders/vertex.glsl", GL_VERTEX_SHADER));
@@ -28,6 +32,7 @@ public class Renderer {
 
     public void createUniforms() {
         uniformMap.createUniform("projection");
+        uniformMap.createUniform("view");
         uniformMap.createUniform("model");
         uniformMap.createUniform("texSampler");
     }
@@ -36,6 +41,7 @@ public class Renderer {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         shaderProgram.bind();
         uniformMap.setUniform("projection", scene.getProjection());
+        uniformMap.setUniform("view", scene.getCamera().getView());
         uniformMap.setUniform("texSampler", 0);
         Collection<Model> models = scene.getModelMap().values();
         TextureCache textureCache = scene.getTextureCache();

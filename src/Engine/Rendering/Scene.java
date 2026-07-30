@@ -13,12 +13,15 @@ public class Scene {
 
     private Matrix4f projection;
 
+    private Camera camera;
+
     private Map<String, Model> modelMap;
     private TextureCache textureCache;
 
     public Scene(int width, int height) {
         textureCache = new TextureCache();
         modelMap = new HashMap<>();
+        camera = new Camera();
         projection = new Matrix4f();
         projection.initPerspective(FOV, (float) width / height, Z_NEAR, Z_FAR);
     }
@@ -50,6 +53,10 @@ public class Scene {
 
     public Map<String, Model> getModelMap() {
         return modelMap;
+    }
+
+    public Camera getCamera() {
+        return camera;
     }
 
     public Matrix4f getProjection() {

@@ -16,6 +16,8 @@ public class Game implements IEngineLogic {
     float scale;
     Vector3f position;
     Quaternionf rotation;
+    Vector3f newCameraPosition;
+    Quaternionf newCameraRotation;
     final static Vector3f Y_AXIS = new Vector3f(0, 1, 0);
     final static Vector3f XYZ_AXES = new Vector3f(0.5f, 1, 1.2f);
     float angle = 0.0f;
@@ -94,52 +96,92 @@ public class Game implements IEngineLogic {
         Model model = new Model(modelId, materialList);
         scene.addModel(model);
 
+        newCameraPosition = new Vector3f();
+        newCameraRotation = new Quaternionf();
+
         XYZ_AXES.norm();
-        scale = 0;
+        scale = 1;
         multiple = 0;
-        position = new Vector3f(0.0f, 0.0f, -5.0f);
+        position = new Vector3f(0.0f, 0.0f, -3.0f);
         rotation = new Quaternionf();
 
         entity = new Entity("cubeEntity", modelId);
         entity.setRotation(rotation);
         entity.setPosition(position);
-        entity.updateModelMatrix();
+        entity.updateModel();
         scene.addEntity(entity);
     }
 
     @Override
     public void input(Window window, Scene scene, long deltaTimeMillis) {
         float delta = (float) deltaTimeMillis / 1000.0f;
+        Vector3f oldCameraPosition = scene.getCamera().getPosition();
+        Quaternionf oldCameraRotation = scene.getCamera().getRotation();
+        newCameraPosition.set(oldCameraPosition);
+        newCameraRotation.set(oldCameraRotation);
+
+        Vector3f moveVector = new Vector3f();
+        Vector3f forward = new Vector3f();
+        Vector3f backward = new Vector3f();
+        Vector3f right = new Vector3f();
+        Vector3f left = new Vector3f();
+
+        scene.getCamera().getForward(forward);
+        backward.set(forward).scale(-1.0f);
+        scene.getCamera().getRight(right);
+        left.set(right).scale(-1.0f);
+
+        float moveAmount = delta * 90.0f;
+        float rotationAmount = 0;
+
         if (window.isKeyPressed(GLFW_KEY_W)) {
-            position.setY(5f * delta + entity.getPosition().getY());
+            moveVector.add(forward);
         }
         if (window.isKeyPressed(GLFW_KEY_S)) {
-            position.setY(-5f * delta + entity.getPosition().getY());
+            moveVector.add(backward);
         }
         if (window.isKeyPressed(GLFW_KEY_A)) {
-            position.setX(-5f * delta + entity.getPosition().getX());
+            moveVector.add(left);
         }
         if (window.isKeyPressed(GLFW_KEY_D)) {
-            position.setX(5f * delta + entity.getPosition().getX());
+            moveVector.add(right);
         }
         if (window.isKeyPressed(GLFW_KEY_Q)) {
-            position.setZ(-5f * delta + entity.getPosition().getZ());
+            rotationAmount += 1;
         }
         if (window.isKeyPressed(GLFW_KEY_E)) {
-            position.setZ(5f * delta + entity.getPosition().getZ());
+            rotationAmount -= 1;
         }
+        if (window.isKeyPressed(GLFW_KEY_P)) {
+            System.out.println(forward);
+        }
+        if (moveVector.lenSq() != 0 && moveVector.lenSq() != 1) {
+            moveVector.norm();
+        }
+        moveVector.scale(moveAmount);
+        rotationAmount *= 50 * delta;
+        newCameraPosition.add(moveVector);
+        Quaternionf updateRotation = new Quaternionf();
+        updateRotation.initRotation(rotationAmount, Y_AXIS);
+        newCameraRotation.mul(updateRotation);
+        newCameraRotation.norm();
+
         angle += 5f * delta;
         multiple += delta;
         rotation.initRotation(angle, Y_AXIS);
-        scale = 1.5f + (float) Math.sin(Math.PI * multiple);
-        entity.setScale(scale);
-        entity.setRotation(rotation);
-        entity.setPosition(position);
+        //scale = 1.5f + (float) Math.sin(Math.PI * multiple);
+        //entity.setScale(scale);
+        //entity.setRotation(rotation);
+        //entity.setPosition(position);
     }
 
     @Override
     public void update(Window window, Scene scene, long deltaTimeMillis) {
-        entity.updateModelMatrix();
+        entity.updateModel();
+        Camera camera = scene.getCamera();
+        camera.setRotation(newCameraRotation);
+        camera.setPosition(newCameraPosition);
+        camera.updateView();
     }
 
     @Override
