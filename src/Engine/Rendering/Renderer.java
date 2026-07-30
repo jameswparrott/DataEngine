@@ -59,17 +59,6 @@ public class Renderer {
                     }
                 }
             }
-
-            /*model.getMeshList().forEach(mesh -> {
-                glBindVertexArray(mesh.getVaoId());
-                List<Entity> entities = model.getEntityList();
-                for (Entity entity : entities) {
-                    uniformMap.setUniform("model", entity.getModelMatrix());
-                    glDrawElements(GL_TRIANGLES, mesh.getNumVertices(), GL_UNSIGNED_INT, 0);
-                }
-            });*/
-
-
         }
         glBindVertexArray(0);
         shaderProgram.unbind();

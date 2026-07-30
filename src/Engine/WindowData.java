@@ -6,4 +6,5 @@ public record WindowData(String title,
                          int ups,
                          int windowWidth,
                          int windowHeight) {
+
 }
