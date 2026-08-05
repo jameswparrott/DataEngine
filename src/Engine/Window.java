@@ -1,5 +1,7 @@
 package Engine;
 
+import org.lwjgl.glfw.GLFWFramebufferSizeCallback;
+import org.lwjgl.glfw.GLFWKeyCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.system.MemoryUtil;
@@ -17,8 +19,11 @@ public class Window {
     private int windowHeight;
     private int windowWidth;
     private final Callable<Void> resizeFunction;
+    private final GLFWFramebufferSizeCallback framebufferSizeCallback;
+    private final GLFWErrorCallback errorCallback;
+    private final GLFWKeyCallback keyCallback;
 
-    public Window(WindowData windowData, Callable<Void> resizeFunction) {
+    public Window(String title, boolean isProfileCompatible, boolean vsync, int width, int height, Callable<Void> resizeFunction) {
 
         this.resizeFunction = resizeFunction;
 
@@ -31,16 +36,16 @@ public class Window {
         glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
-        if (windowData.isProfileCompatible()) {
+        if (isProfileCompatible) {
             glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
         } else {
             glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
             glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
         }
 
-        if (windowData.windowWidth() > 0 && windowData.windowHeight() > 0) {
-            this.windowWidth = windowData.windowWidth();
-            this.windowHeight = windowData.windowHeight();
+        if (width > 0 && height > 0) {
+            this.windowWidth = width;
+            this.windowHeight = height;
         } else {
             glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
             GLFWVidMode vidMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
@@ -50,25 +55,19 @@ public class Window {
             }
         }
 
-        windowHandle = glfwCreateWindow(windowWidth, windowHeight, windowData.title(), NULL, NULL);
+        windowHandle = glfwCreateWindow(windowWidth, windowHeight, title, NULL, NULL);
         if (windowHandle == NULL) {
             throw new RuntimeException("Failed to create the GLFW window");
         }
 
-        glfwSetFramebufferSizeCallback(windowHandle, (window, w, h) -> resized(w, h));
-        glfwSetErrorCallback((int errorCode, long msgPtr) -> System.err.println("Error code: " + errorCode + ", msg: " + MemoryUtil.memUTF8(msgPtr)));
-        glfwSetKeyCallback(windowHandle, (window, key, scancode, action, mods) -> {
+        framebufferSizeCallback = glfwSetFramebufferSizeCallback(windowHandle, (window, w, h) -> resized(w, h));
+        errorCallback = glfwSetErrorCallback((int errorCode, long msgPtr) -> System.err.println("Error code: " + errorCode + ", msg: " + MemoryUtil.memUTF8(msgPtr)));
+        keyCallback = glfwSetKeyCallback(windowHandle, (window, key, scancode, action, mods) -> {
             keyCallBack(key, action);
         });
 
         glfwMakeContextCurrent(windowHandle);
-
-        if (windowData.fps() > 0) {
-            glfwSwapInterval(0);
-        } else {
-            glfwSwapInterval(1);
-        }
-
+        glfwSwapInterval(vsync ? 1 : 0);
         glfwShowWindow(windowHandle);
 
         int[] arrWidth = new int[1];
@@ -127,13 +126,12 @@ public class Window {
     }
 
     public void cleanup() {
+        if (errorCallback != null) {
+            errorCallback.free();
+        }
         glfwFreeCallbacks(windowHandle);
         glfwDestroyWindow(windowHandle);
         glfwTerminate();
-        GLFWErrorCallback callback = glfwSetErrorCallback(null);
-        if (callback != null) {
-            callback.free();
-        }
     }
 
 }

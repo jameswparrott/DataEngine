@@ -113,8 +113,7 @@ public class Game implements IEngineLogic {
     }
 
     @Override
-    public void input(Window window, Scene scene, long deltaTimeMillis) {
-        float delta = (float) deltaTimeMillis / 1000.0f;
+    public void input(Window window, Scene scene, float deltaTimeSeconds) {
         Vector3f oldCameraPosition = scene.getCamera().getPosition();
         Quaternionf oldCameraRotation = scene.getCamera().getRotation();
         newCameraPosition.set(oldCameraPosition);
@@ -131,7 +130,7 @@ public class Game implements IEngineLogic {
         scene.getCamera().getRight(right);
         left.set(right).scale(-1.0f);
 
-        float moveAmount = delta * 90.0f;
+        float moveAmount = deltaTimeSeconds * 5.0f;
         float rotationAmount = 0;
 
         if (window.isKeyPressed(GLFW_KEY_W)) {
@@ -152,31 +151,27 @@ public class Game implements IEngineLogic {
         if (window.isKeyPressed(GLFW_KEY_E)) {
             rotationAmount -= 1;
         }
-        if (window.isKeyPressed(GLFW_KEY_P)) {
-            System.out.println(forward);
+        if (window.isKeyPressed(GLFW_KEY_O)) {
+            System.out.println("input delta: " + deltaTimeSeconds);
         }
         if (moveVector.lenSq() != 0 && moveVector.lenSq() != 1) {
             moveVector.norm();
         }
         moveVector.scale(moveAmount);
-        rotationAmount *= 50 * delta;
+        rotationAmount *= 4 * deltaTimeSeconds;
         newCameraPosition.add(moveVector);
         Quaternionf updateRotation = new Quaternionf();
         updateRotation.initRotation(rotationAmount, Y_AXIS);
         newCameraRotation.mul(updateRotation);
         newCameraRotation.norm();
 
-        angle += 5f * delta;
-        multiple += delta;
+        angle += deltaTimeSeconds;
+        multiple += deltaTimeSeconds;
         rotation.initRotation(angle, Y_AXIS);
-        //scale = 1.5f + (float) Math.sin(Math.PI * multiple);
-        //entity.setScale(scale);
-        //entity.setRotation(rotation);
-        //entity.setPosition(position);
     }
 
     @Override
-    public void update(Window window, Scene scene, long deltaTimeMillis) {
+    public void update(Window window, Scene scene, float deltaTimeSeconds) {
         entity.updateModel();
         Camera camera = scene.getCamera();
         camera.setRotation(newCameraRotation);

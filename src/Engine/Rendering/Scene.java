@@ -8,7 +8,7 @@ import java.util.Map;
 public class Scene {
 
     private static final float FOV = (float) Math.toRadians(60.0f);
-    private static final float Z_NEAR = 0.050f;
+    private static final float Z_NEAR = 0.005f;
     private static final float Z_FAR = 1000.0f;
 
     private Matrix4f projection;

@@ -3,27 +3,27 @@ package Engine;
 import Engine.Rendering.Renderer;
 import Engine.Rendering.Scene;
 
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_P;
+
 public class Engine {
 
     private final IEngineLogic iEngineLogic;
     private final Window window;
+    private final Time time;
     private final Renderer renderer;
     private final Scene scene;
     private boolean isRunning;
-    private final int targetUps;
-    private final int targetFps;
 
-    public Engine(WindowData windowData, IEngineLogic iEngineLogic) {
+    public Engine(IEngineLogic iEngineLogic) {
 
-        this.window = new Window(windowData, () -> {
+        this.window = new Window("", false, true, 800, 600, () -> {
             resize();
             return null;
         });
         this.iEngineLogic = iEngineLogic;
-        targetFps = windowData.fps();
-        targetUps = windowData.ups();
+        time = new Time();
         renderer = new Renderer();
-        scene = new Scene(windowData.windowWidth(), windowData.windowHeight());
+        scene = new Scene(window.getWindowWidth(), window.getWindowHeight());
         isRunning = false;
         iEngineLogic.init(window, scene, renderer);
 
@@ -35,43 +35,19 @@ public class Engine {
     }
 
     public void run() {
-        long initialTime = System.currentTimeMillis();
-
-        float timeUpdate = targetUps / 1000.0f; //Inverse of time between update calls
-        float timeRender = targetFps / 1000.0f; //Inverse of time between render calls
-
-        float deltaUps = 0;
-        float deltaFps = 0;
-
-        long updateTime = initialTime;
-
+        time.frame();
         while (isRunning && !window.windowShouldClose()) {
-
             window.pollEvents();
-            long currentTime = System.currentTimeMillis();
-            deltaUps += (currentTime - initialTime) * timeUpdate;
-            deltaFps += (currentTime - initialTime) * timeRender;
-
-            if (deltaFps >= 1) {
-                iEngineLogic.input(window, scene, currentTime - initialTime);
+            time.frame();
+            if (window.isKeyPressed(GLFW_KEY_P)) {
+                System.out.println("update delta: " + time.getFramesPerSecond());
             }
-            if (deltaUps >= 1) {
-                long deltaUpdateMillis = currentTime - updateTime;
-                iEngineLogic.update(window, scene, deltaUpdateMillis);
-                deltaUps--;
-            }
-            if (deltaFps >= 1) {
-                renderer.render(window, scene);
-                deltaFps--;
-                window.update();
-            }
-
-            initialTime = currentTime;
-
+            iEngineLogic.input(window, scene, time.getDeltaFrameTimeSeconds());
+            iEngineLogic.update(window, scene, time.getDeltaFrameTimeSeconds());
+            renderer.render(window, scene);
+            window.update();
         }
-
         cleanup();
-
     }
 
     public void resize() {

@@ -7,9 +7,9 @@ public interface IEngineLogic {
 
     void init(Window window, Scene scene, Renderer renderer);
 
-    void input(Window window, Scene scene, long deltaTimeMillis);
+    void input(Window window, Scene scene, float deltaTimeSeconds);
 
-    void update(Window window, Scene scene, long deltaTimeMillis);
+    void update(Window window, Scene scene, float deltaTimeSeconds);
 
     void cleanup();
 
