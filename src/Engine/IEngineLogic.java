@@ -5,11 +5,11 @@ import Engine.Rendering.Scene;
 
 public interface IEngineLogic {
 
-    void init(Window window, Scene scene, Renderer renderer);
+    void init(Scene scene, Renderer renderer);
 
-    void input(Window window, Scene scene, float deltaTimeSeconds);
+    void input(Input input, Scene scene, float deltaTimeSeconds);
 
-    void update(Window window, Scene scene, float deltaTimeSeconds);
+    void update(Scene scene, float deltaTimeSeconds);
 
     void cleanup();
 

@@ -1,6 +1,7 @@
 package Game;
 
 import Engine.IEngineLogic;
+import Engine.Input;
 import Engine.Math.Quaternionf;
 import Engine.Math.Vector3f;
 import Engine.Rendering.*;
@@ -28,7 +29,7 @@ public class Game implements IEngineLogic {
     }
 
     @Override
-    public void init(Window window, Scene scene, Renderer renderer) {
+    public void init(Scene scene, Renderer renderer) {
         float[] positions = new float[]{
                 // Front
                 -1, -1, 1,
@@ -113,7 +114,7 @@ public class Game implements IEngineLogic {
     }
 
     @Override
-    public void input(Window window, Scene scene, float deltaTimeSeconds) {
+    public void input(Input input, Scene scene, float deltaTimeSeconds) {
         Vector3f oldCameraPosition = scene.getCamera().getPosition();
         Quaternionf oldCameraRotation = scene.getCamera().getRotation();
         newCameraPosition.set(oldCameraPosition);
@@ -133,25 +134,25 @@ public class Game implements IEngineLogic {
         float moveAmount = deltaTimeSeconds * 5.0f;
         float rotationAmount = 0;
 
-        if (window.isKeyPressed(GLFW_KEY_W)) {
+        if (input.isKeyHeld(Input.Key.W)) {
             moveVector.add(forward);
         }
-        if (window.isKeyPressed(GLFW_KEY_S)) {
+        if (input.isKeyHeld(Input.Key.S)) {
             moveVector.add(backward);
         }
-        if (window.isKeyPressed(GLFW_KEY_A)) {
+        if (input.isKeyHeld(Input.Key.A)) {
             moveVector.add(left);
         }
-        if (window.isKeyPressed(GLFW_KEY_D)) {
+        if (input.isKeyHeld(Input.Key.D)) {
             moveVector.add(right);
         }
-        if (window.isKeyPressed(GLFW_KEY_Q)) {
+        if (input.isKeyHeld(Input.Key.Q)) {
             rotationAmount += 1;
         }
-        if (window.isKeyPressed(GLFW_KEY_E)) {
+        if (input.isKeyHeld(Input.Key.E)) {
             rotationAmount -= 1;
         }
-        if (window.isKeyPressed(GLFW_KEY_O)) {
+        if (input.isKeyHeld(Input.Key.O)) {
             System.out.println("input delta: " + deltaTimeSeconds);
         }
         if (moveVector.lenSq() != 0 && moveVector.lenSq() != 1) {
@@ -171,7 +172,7 @@ public class Game implements IEngineLogic {
     }
 
     @Override
-    public void update(Window window, Scene scene, float deltaTimeSeconds) {
+    public void update(Scene scene, float deltaTimeSeconds) {
         entity.updateModel();
         Camera camera = scene.getCamera();
         camera.setRotation(newCameraRotation);

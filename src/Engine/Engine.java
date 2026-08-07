@@ -3,11 +3,10 @@ package Engine;
 import Engine.Rendering.Renderer;
 import Engine.Rendering.Scene;
 
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_P;
-
 public class Engine {
 
     private final IEngineLogic iEngineLogic;
+    private final Input input;
     private final Window window;
     private final Time time;
     private final Renderer renderer;
@@ -16,16 +15,18 @@ public class Engine {
 
     public Engine(IEngineLogic iEngineLogic) {
 
-        this.window = new Window("", false, true, 800, 600, () -> {
-            resize();
-            return null;
-        });
+        this.input = new Input();
+        this.window = new Window("", false, true, 800, 600, input,
+                () -> {
+                    resize();
+                    return null;
+                });
         this.iEngineLogic = iEngineLogic;
         time = new Time();
         renderer = new Renderer();
         scene = new Scene(window.getWindowWidth(), window.getWindowHeight());
         isRunning = false;
-        iEngineLogic.init(window, scene, renderer);
+        iEngineLogic.init(scene, renderer);
 
     }
 
@@ -37,13 +38,14 @@ public class Engine {
     public void run() {
         time.frame();
         while (isRunning && !window.windowShouldClose()) {
-            window.pollEvents();
             time.frame();
-            if (window.isKeyPressed(GLFW_KEY_P)) {
-                System.out.println("update delta: " + time.getFramesPerSecond());
+            input.update();
+            window.pollEvents();
+            if (input.isKeyHeld(Input.Key.ESCAPE)){
+                window.setWindowShouldClose();
             }
-            iEngineLogic.input(window, scene, time.getDeltaFrameTimeSeconds());
-            iEngineLogic.update(window, scene, time.getDeltaFrameTimeSeconds());
+            iEngineLogic.input(input, scene, time.getDeltaFrameTimeSeconds());
+            iEngineLogic.update(scene, time.getDeltaFrameTimeSeconds());
             renderer.render(window, scene);
             window.update();
         }

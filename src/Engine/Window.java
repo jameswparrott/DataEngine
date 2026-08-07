@@ -1,9 +1,6 @@
 package Engine;
 
-import org.lwjgl.glfw.GLFWFramebufferSizeCallback;
-import org.lwjgl.glfw.GLFWKeyCallback;
-import org.lwjgl.glfw.GLFWVidMode;
-import org.lwjgl.glfw.GLFWErrorCallback;
+import org.lwjgl.glfw.*;
 import org.lwjgl.system.MemoryUtil;
 
 import java.util.concurrent.Callable;
@@ -18,13 +15,17 @@ public class Window {
     private final long windowHandle;
     private int windowHeight;
     private int windowWidth;
+    private final Input input;
     private final Callable<Void> resizeFunction;
-    private final GLFWFramebufferSizeCallback framebufferSizeCallback;
     private final GLFWErrorCallback errorCallback;
+    private final GLFWFramebufferSizeCallback framebufferSizeCallback;
     private final GLFWKeyCallback keyCallback;
+    private final GLFWMouseButtonCallback mouseButtonCallback;
+    private final GLFWCursorPosCallback cursorPosCallback;
 
-    public Window(String title, boolean isProfileCompatible, boolean vsync, int width, int height, Callable<Void> resizeFunction) {
+    public Window(String title, boolean isProfileCompatible, boolean vsync, int width, int height, Input input, Callable<Void> resizeFunction) {
 
+        this.input = input;
         this.resizeFunction = resizeFunction;
 
         if (!glfwInit()) {
@@ -63,7 +64,13 @@ public class Window {
         framebufferSizeCallback = glfwSetFramebufferSizeCallback(windowHandle, (window, w, h) -> resized(w, h));
         errorCallback = glfwSetErrorCallback((int errorCode, long msgPtr) -> System.err.println("Error code: " + errorCode + ", msg: " + MemoryUtil.memUTF8(msgPtr)));
         keyCallback = glfwSetKeyCallback(windowHandle, (window, key, scancode, action, mods) -> {
-            keyCallBack(key, action);
+            input.keyEvent(key, action);
+        });
+        mouseButtonCallback = glfwSetMouseButtonCallback(windowHandle, (window, button, action, mods) -> {
+            input.mouseEvent(button, action);
+        });
+        cursorPosCallback = glfwSetCursorPosCallback(windowHandle, (window, xpos, ypos) -> {
+            input.cursorEvent(xpos, ypos);
         });
 
         glfwMakeContextCurrent(windowHandle);
@@ -87,22 +94,12 @@ public class Window {
         }
     }
 
-    public void keyCallBack(int key, int action) {
-        if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE) {
+    public void setWindowShouldClose() {
             glfwSetWindowShouldClose(windowHandle, true);
-        }
     }
 
     public void pollEvents() {
         glfwPollEvents();
-    }
-
-    public boolean isKeyPressed(int keyCode) {
-        return glfwGetKey(windowHandle, keyCode) == GLFW_PRESS;
-    }
-
-    public boolean isKeyReleased(int keyCode) {
-        return glfwGetKey(windowHandle, keyCode) == GLFW_RELEASE;
     }
 
     public void update() {
